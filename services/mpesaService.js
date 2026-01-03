@@ -144,7 +144,7 @@ class MpesaService {
         BusinessShortCode: numericShortcode,
         Password: password,
         Timestamp: timestamp,
-        TransactionType: 'CustomerPayBillOnline', // For till number payments
+        TransactionType: 'CustomerBuyGoodsOnline', // For buy goods online payments
         Amount: numericAmount,
         PartyA: formattedPhone,
         PartyB: numericShortcode,

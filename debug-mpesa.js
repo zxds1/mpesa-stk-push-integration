@@ -66,7 +66,7 @@ async function debugMpesa() {
       BusinessShortCode: shortcode,
       Password: password,
       Timestamp: timestamp,
-      TransactionType: 'CustomerPayBillOnline',
+      TransactionType: 'CustomerBuyGoodsOnline',
       Amount: 10,
       PartyA: formattedPhone,
       PartyB: shortcode,

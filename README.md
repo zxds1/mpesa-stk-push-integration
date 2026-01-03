@@ -1,10 +1,10 @@
-# M-Pesa Till Number Payment Module
+# M-Pesa Buy Goods Online Payment Module
 
-A Node.js Express API module for integrating M-Pesa till number payments using the M-Pesa Express (STK Push) API.
+A Node.js Express API module for integrating M-Pesa buy goods online payments using the M-Pesa Express (STK Push) API.
 
 ## Features
 
-- Initiate STK Push payments for till numbers
+- Initiate STK Push payments for buy goods online
 - Handle M-Pesa callbacks and confirmations
 - Query transaction status
 - Store transaction data in MongoDB
@@ -29,7 +29,7 @@ A Node.js Express API module for integrating M-Pesa till number payments using t
    ```env
    MPESA_CONSUMER_KEY=your_consumer_key
    MPESA_CONSUMER_SECRET=your_consumer_secret
-   MPESA_SHORTCODE=your_till_number
+   MPESA_SHORTCODE=your_buy_goods_shortcode
    MPESA_PASSKEY=your_passkey
    NODE_ENV=development
    PORT=3000
@@ -114,10 +114,35 @@ Alternative confirmation endpoint.
 
 ## M-Pesa Setup
 
-1. Register for M-Pesa Developer account at https://developer.safaricom.co.ke/
-2. Create an app and get consumer key/secret
-3. Configure your callback URLs in the M-Pesa portal
-4. For till number payments, use "CustomerPayBillOnline" as TransactionType
+### Getting Environment Variables
+
+1. **Register for M-Pesa Developer Account**
+   - Visit https://developer.safaricom.co.ke/
+   - Create an account and verify your email
+
+2. **Create an Application**
+   - Log in to the developer portal
+   - Go to "My Apps" and click "Create App"
+   - Fill in the application details
+   - Note down your **Consumer Key** and **Consumer Secret**
+
+3. **Get Your Buy Goods Online Shortcode**
+   - In the developer portal, go to "Test Credentials"
+   - For sandbox testing, use the default shortcode: `174379`
+   - For production, you'll need to register your business with Safaricom to get a live shortcode
+
+4. **Get Your Passkey**
+   - In the developer portal, go to "Test Credentials"
+   - Copy the **Passkey** for the Buy Goods Online service
+   - For sandbox: `bfb279f9aa9bdbcf158e97dd71a467cd`
+   - For production: This will be provided when you register for live services
+
+5. **Configure Callback URLs**
+   - Set up your callback URL in the developer portal
+   - This should point to your `/api/mpesa/callback` endpoint
+   - Example: `https://your-domain.com/api/mpesa/callback`
+
+6. **For Buy Goods Online payments, use "CustomerBuyGoodsOnline" as TransactionType**
 
 ## Database Schema
 
@@ -133,10 +158,46 @@ Transactions are stored in MongoDB with the following schema:
 
 ## Security
 
-- Rate limiting (100 requests per 15 minutes per IP)
-- Input validation using express-validator
-- HTTPS recommended for production
-- Environment variables for sensitive data
+### HTTPS Requirements
+
+**M-Pesa API requires HTTPS for all callback URLs in production:**
+
+1. **Development Environment**
+   - Use HTTP for local testing
+   - M-Pesa sandbox accepts HTTP callback URLs
+   - Example: `http://localhost:3000/api/mpesa/callback`
+
+2. **Production Environment**
+   - **HTTPS is mandatory** for all callback URLs
+   - Obtain SSL certificate for your domain
+   - Configure your web server (nginx, Apache) with SSL
+   - Example: `https://your-domain.com/api/mpesa/callback`
+
+3. **SSL Certificate Options**
+   - **Let's Encrypt**: Free SSL certificates (recommended)
+   - **Commercial SSL**: Purchase from certificate authorities
+   - **Cloud Provider SSL**: AWS, Google Cloud, Azure provide SSL options
+
+### Security Best Practices
+
+- **Rate limiting** (100 requests per 15 minutes per IP)
+- **Input validation** using express-validator
+- **Environment variables** for sensitive data (never commit to version control)
+- **HTTPS** required for production callback URLs
+- **Secure storage** of API credentials
+- **Request logging** for audit trails
+- **Error handling** without exposing sensitive information
+
+### Production Security Checklist
+
+- [ ] Obtain SSL certificate for your domain
+- [ ] Configure HTTPS on your web server
+- [ ] Update callback URLs to use HTTPS
+- [ ] Set up environment variables in production
+- [ ] Configure firewall rules for API access
+- [ ] Enable request logging and monitoring
+- [ ] Set up proper error handling
+- [ ] Test with M-Pesa sandbox before going live
 
 ## Logging
 
