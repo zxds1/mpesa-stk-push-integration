@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M-Pesa Payment Module</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #27ae60;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #229954;
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>M-Pesa Till Number Payment</h1>
+
+        <form id="paymentForm">
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number:</label>
+                <input type="text" id="phoneNumber" placeholder="254712345678" required>
+            </div>
+
+            <div class="form-group">
+                <label for="amount">Amount (KES):</label>
+                <input type="number" id="amount" min="1" placeholder="100" required>
+            </div>
+
+            <div class="form-group">
+                <label for="accountReference">Account Reference:</label>
+                <input type="text" id="accountReference" placeholder="Order123" required>
+            </div>
+
+            <div class="form-group">
+                <label for="transactionDesc">Transaction Description:</label>
+                <input type="text" id="transactionDesc" placeholder="Payment for services" value="Payment for services">
+            </div>
+
+            <button type="submit" id="submitBtn">
+                <span id="btnText">Initiate Payment</span>
+            </button>
+        </form>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('paymentForm');
+        const resultDiv = document.getElementById('result');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const amount = document.getElementById('amount').value;
+            const accountReference = document.getElementById('accountReference').value;
+            const transactionDesc = document.getElementById('transactionDesc').value;
+
+            // Show loading
+            submitBtn.disabled = true;
+            btnText.innerHTML = '<div class="loading"></div>Processing...';
+
+            try {
+                const response = await fetch('/api/mpesa/initiate-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        phoneNumber,
+                        amount: parseInt(amount),
+                        accountReference,
+                        transactionDesc,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <strong>Payment Initiated Successfully!</strong><br>
+                        Checkout Request ID: ${data.data.checkoutRequestId}<br>
+                        Response: ${data.data.responseDescription}<br>
+                        Customer Message: ${data.data.customerMessage}
+                    `;
+                } else {
+                    throw new Error(data.error || 'Payment initiation failed');
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
+            } finally {
+                // Reset button
+                submitBtn.disabled = false;
+                btnText.textContent = 'Initiate Payment';
+                resultDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

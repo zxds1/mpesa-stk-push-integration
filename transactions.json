@@ -1,0 +1,14 @@
+[
+  {
+    "checkoutRequestId": "ws_CO_03012026081712913708374149",
+    "merchantRequestId": "7c8a-41e2-bee9-5828994ce2e215765",
+    "phoneNumber": "254708374149",
+    "amount": 10,
+    "accountReference": "test123",
+    "transactionDesc": "Test payment",
+    "status": "pending",
+    "id": "1767417433735",
+    "createdAt": "2026-01-03T05:17:13.735Z",
+    "updatedAt": "2026-01-03T05:17:13.735Z"
+  }
+]
